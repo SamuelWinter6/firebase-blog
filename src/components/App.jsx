@@ -8,7 +8,7 @@ import { fetchArticles, createArticle } from "../services/articleService";
 import "./App.css";
 
 import experimentalAircraftImg from "../assets/550577.jpg";
-import spacecraftImg from "../assets/nasa-space-shuttle-take-off-moon-4k-wallpaper-uhdpaper.com-206@3@a.jpg";
+import spacecraftImg from "../assets/24663-2880x1800-desktop-hd-space-shuttle-wallpaper-photo.jpg";
 import generalAviationImg from "../assets/e742kp1k2vl51.png";
 import defaultBackgroundImg from "../assets/nasa-space-shuttle-take-off-moon-4k-wallpaper-uhdpaper.com-206@3@a.jpg";
 
@@ -22,17 +22,18 @@ export default function App() {
     if (user) {
       fetchArticles().then(setArticles);
     }
-  }, [user]);
 
-  // Use a separate `useEffect` to handle background image changes based on selectedArticle
-  useEffect(() => {
-    if (selectedArticle && selectedArticle.category) {
+    if (selectedArticle) {
+      document.body.classList.add("article-selected");
       updateBackgroundImage(selectedArticle);
     } else {
-      // Only set default if no article is selected
+      document.body.classList.remove("article-selected");
       document.body.style.backgroundImage = `url(${defaultBackgroundImg})`;
     }
-  }, [selectedArticle]); // Dependency on `selectedArticle` only
+
+    // Cleanup to ensure class is removed when component unmounts
+    return () => document.body.classList.remove("article-selected");
+  }, [user, selectedArticle]);
 
   function addArticle(articleData) {
     createArticle(articleData).then((newArticle) => {
@@ -52,29 +53,27 @@ export default function App() {
   function handleBack() {
     setSelectedArticle(null);
     setWriting(false);
+    document.body.classList.remove("article-selected");
     document.body.style.backgroundImage = `url(${defaultBackgroundImg})`;
   }
 
   function updateBackgroundImage(article) {
     let backgroundImage;
-    if (article.BackgroundImageUrl) {
-      backgroundImage = `url(${article.BackgroundImageUrl})`;
-      console.log("Using custom background image:", backgroundImage);
-    } else {
-      switch (article.category) {
-        case "Experimental Aircraft":
-          backgroundImage = `url(${experimentalAircraftImg})`;
-          break;
-        case "Spacecraft":
-          backgroundImage = `url(${spacecraftImg})`;
-          break;
-        case "General Aviation":
-          backgroundImage = `url(${generalAviationImg})`;
-          break;
-        default:
-          backgroundImage = `url(${defaultBackgroundImg})`;
-      }
-      console.log("Using category-based background image:", backgroundImage);
+    switch (article.category) {
+      case "Experimental Aircraft":
+        backgroundImage = `url(${defaultBackgroundImg})`;
+        // backgroundImage = `url(${experimentalAircraftImg})`;
+        break;
+      case "Spacecraft":
+        backgroundImage = `url(${defaultBackgroundImg})`;
+        // backgroundImage = `url(${spacecraftImg})`;
+        break;
+      case "General Aviation":
+        backgroundImage = `url(${defaultBackgroundImg})`;
+        // backgroundImage = `url(${generalAviationImg})`;
+        break;
+      default:
+        backgroundImage = `url(${defaultBackgroundImg})`;
     }
     document.body.style.backgroundImage = backgroundImage;
   }
@@ -110,7 +109,7 @@ export default function App() {
               <p>Please select an article to view or create a new one.</p>
             )
           ) : (
-            <p>Please sign in to view articles.</p>
+            <p>Please sign in to view and create articles.</p>
           )}
         </div>
       </div>

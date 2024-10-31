@@ -86,11 +86,20 @@ export default function ArticleEntry({ addArticle }) {
           <option value="General Aviation">General Aviation</option>
         </select>
 
-        <label>Background Image</label>
+        {/* Background Image Upload Button */}
+        <button
+          type="button"
+          className="button"
+          onClick={() => document.getElementById('background-upload').click()}
+        >
+          Choose Background Image
+        </button>
         <input
+          id="background-upload"
           type="file"
           onChange={handleBackgroundImageUpload}
           accept="image/*"
+          style={{ display: 'none' }} // Hides the input element
         />
 
         <label>Comments</label>
@@ -101,12 +110,21 @@ export default function ArticleEntry({ addArticle }) {
           placeholder="Add comments (optional)"
         ></textarea>
 
-        <label>Gallery Images</label>
+        {/* Gallery Images Upload Button */}
+        <button
+          type="button"
+          className="button"
+          onClick={() => document.getElementById('gallery-upload').click()}
+        >
+          Choose Gallery Images
+        </button>
         <input
+          id="gallery-upload"
           type="file"
           onChange={handleGalleryImagesUpload}
           accept="image/*"
           multiple
+          style={{ display: 'none' }} // Hides the input element
         />
 
         <button className="button" type="submit">Create</button>

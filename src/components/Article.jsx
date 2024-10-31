@@ -4,7 +4,7 @@ export default function Article({ article }) {
   }
 
   const { title, date, body, gallery, comments } = article;
-
+  
   return (
     <article>
       <section>

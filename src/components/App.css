@@ -1,15 +1,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Open+Sans:wght@400&display=swap');
 
-/* Base body styling with smooth transition for background */
+/* Base body styling */
 body {
   margin: 0;
   font-family: 'Open Sans', sans-serif;
   color: #ffffff;
   background-size: cover;
   background-position: center;
-  background-attachment: fixed;
-  transition: background-image 0.5s ease-in-out;
   overflow-x: hidden;
+  position: relative;
+}
+
+/* Pseudo-element for background image with blur effect */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  transition: filter 0.5s ease-in-out;
+  background-image: inherit; /* Inherits the current background image */
+  filter: blur(0px); /* Default no blur */
+}
+
+/* Add blur only when an article is selected */
+body.article-selected::before {
+  filter: blur(8px); /* Adjust blur level as needed */
+}
+
+/* Add keyframes for blurring in and out */
+@keyframes blurOutIn {
+  0%, 100% {
+    filter: blur(0px);
+  }
+  50% {
+    filter: blur(8px); /* Adjust blur level as needed */
+  }
+}
+
+/* Apply the blur animation */
+.fade-background {
+  animation: blurOutIn 1s ease-in-out;
 }
 
 /* Main App container */
@@ -70,7 +106,71 @@ body {
   margin: 0 auto; /* Center the form horizontally */
 }
 
-/* Standard button styling */
+/* Form styling for article entry */
+.article-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; /* Increase gap between input elements */
+  margin-bottom: 20px; /* Add bottom margin to the form */
+}
+
+.article-entry label {
+  font-size: 1em;
+  font-weight: bold;
+  margin-bottom: 5px; /* Add space between labels and inputs */
+}
+
+/* Adjusting spacing for input elements, including text fields and file uploads */
+.article-entry input[type="text"],
+.article-entry textarea,
+.article-entry select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  background-color: #ffffff;
+  color: #333;
+  box-sizing: border-box;
+  margin-top: 15px; /* Consistent top margin for all inputs */
+  margin-bottom: 15px; /* Consistent bottom margin for all inputs */
+}
+
+.article-entry textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+/* Styling for file upload labels to look like buttons */
+.file-upload-label {
+  align-self: flex-start;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-size: 1em;
+  cursor: pointer;
+  font-family: 'Playfair Display', serif;
+  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+  line-height: 1.2;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.file-upload-label:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: scale(1.05);
+}
+
+/* Hide the actual file input */
+.article-entry input[type="file"] {
+  display: none;
+}
+
+/* Button styling */
 .button, .back-button {
   align-self: flex-start;
   background-color: rgba(255, 255, 255, 0.1);
@@ -86,8 +186,8 @@ body {
   transition: background-color 0.3s ease, transform 0.2s ease;
   display: flex;
   align-items: center;
-  margin-top: 1px;
-  margin-bottom: 2px;
+  margin-top: 15px;
+  margin-bottom: 10px;
 }
 
 .button:hover, .back-button:hover {
@@ -171,44 +271,81 @@ h1 {
   transition: width 0.5s ease;
 }
 
-/* Form styling for article entry */
-.article-entry {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.article-entry label {
-  font-size: 1em;
-  font-weight: bold;
-}
-
-.article-entry input[type="text"],
-.article-entry textarea,
-.article-entry select,
-.article-entry input[type="file"] {
-  width: 100%;
-  padding: 10px;
-  border-radius: 5px;
+.adaptive-input {
+  display: inline-block;
   border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 1em;
   background-color: #ffffff;
   color: #333;
   box-sizing: border-box;
-  margin-top: 5px;
+  min-width: 100px; /* Minimum width to maintain a decent size */
+  max-width: 100%; /* Ensures it doesn't exceed the container */
+  outline: none;
 }
 
-.article-entry textarea {
-  height: 100px;
-  resize: vertical;
+.adaptive-select {
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 8px;
+  font-size: 1em;
+  background-color: #ffffff;
+  color: #333;
+  box-sizing: border-box;
+  min-width: 120px; /* Minimum width for category select */
+  max-width: 100%; /* Ensures it doesn't exceed the container */
+  outline: none;
 }
 
-.article-entry-row {
+/* Article Display specific styles */
+.article-display {
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: #ffffff;
+}
+
+.article-title {
+  font-size: 2em;
+  margin-bottom: 5px;
+}
+
+.article-meta {
+  font-size: 0.9em;
+  color: #cccccc;
+  margin-bottom: 15px;
+}
+
+.article-gallery {
   display: flex;
-  gap: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 15px;
 }
 
-.article-entry-row > div {
-  flex: 1;
+.gallery-image {
+  max-height: 200px;
+  border-radius: 8px;
+  width: auto;
+}
+
+.article-body {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+
+.article-comments {
+  margin-top: 20px;
+}
+
+.article-comments h3 {
+  margin-bottom: 10px;
+}
+
+.article-comments p {
+  margin: 5px 0;
 }
 
 /* Responsive adjustments */
@@ -225,5 +362,9 @@ h1 {
   .button, .back-button {
     font-size: 0.9em;
     padding: 5px 8px;
+  }
+
+  .gallery-image {
+    max-width: 100%; /* Make sure images fit well on smaller screens */
   }
 }
