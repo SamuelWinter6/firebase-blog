@@ -10,16 +10,19 @@ async function fetchArticle(articleId) {
     const articleData = articleSnap.data();
     const backgroundImageUrl = articleData.BackgroundImageUrl || defaultBackgroundImage;
 
-    // Dynamically set background image
+    const formattedDate = articleData.date ? new Date(articleData.date).toLocaleDateString() : "Date not available";
+    const formattedGallery = (articleData.Gallery || []).filter(image => image && image.url);
+
     document.body.style.backgroundImage = `url(${backgroundImageUrl})`;
     document.body.style.backgroundSize = "cover";
     document.body.style.backgroundPosition = "center";
 
     return {
       ...articleData,
-      backgroundImageUrl,
-      gallery: articleData.Gallery || [], // Ensure gallery is an array
-      comments: articleData.Comments || [] // Ensure comments is an array
+      date: formattedDate,
+      BackgroundImageUrl: backgroundImageUrl,
+      Gallery: formattedGallery,
+      Comments: articleData.Comments || []
     };
   } else {
     console.log("No such article found!");

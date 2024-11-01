@@ -31,11 +31,14 @@ export default function App() {
       document.body.style.backgroundImage = `url(${defaultBackgroundImg})`;
     }
 
-    // Cleanup to ensure class is removed when component unmounts
     return () => document.body.classList.remove("article-selected");
   }, [user, selectedArticle]);
 
   function addArticle(articleData) {
+    if (user) {
+      articleData.author = user.displayName || "Anonymous";
+    }
+
     createArticle(articleData).then((newArticle) => {
       setArticles([newArticle, ...articles]);
       setSelectedArticle(newArticle);
@@ -62,15 +65,12 @@ export default function App() {
     switch (article.category) {
       case "Experimental Aircraft":
         backgroundImage = `url(${defaultBackgroundImg})`;
-        // backgroundImage = `url(${experimentalAircraftImg})`;
         break;
       case "Spacecraft":
         backgroundImage = `url(${defaultBackgroundImg})`;
-        // backgroundImage = `url(${spacecraftImg})`;
         break;
       case "General Aviation":
         backgroundImage = `url(${defaultBackgroundImg})`;
-        // backgroundImage = `url(${generalAviationImg})`;
         break;
       default:
         backgroundImage = `url(${defaultBackgroundImg})`;

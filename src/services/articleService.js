@@ -1,7 +1,3 @@
-// This service completely hides the data store from the rest of the app.
-// No other part of the app knows how the data is stored. If anyone wants
-// to read or write data, they have to go through this service.
-
 import { db } from "../firebaseConfig";
 import {
   collection,
@@ -10,32 +6,70 @@ import {
   addDoc,
   orderBy,
   limit,
-  Timestamp,
+  doc,
+  updateDoc,
+  arrayUnion,
+  getDoc,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
-export async function createArticle({ title, body, category, BackgroundImageUrl, Comments, Gallery }) {
-  const data = {
-    title,
-    body,
-    category,
-    BackgroundImageUrl,
-    Comments,
-    Gallery,
-    date: Timestamp.now()
-  };
+export async function createArticle({ title, body, category, BackgroundImageUrl, Comments = [], Gallery }) {
+  try {
+    const auth = getAuth();
+    const user = auth.currentUser;
 
-  const docRef = await addDoc(collection(db, "articles"), data);
-  return { id: docRef.id, ...data };
+    const date = new Date();
+    const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+    const data = {
+      title,
+      body,
+      category,
+      BackgroundImageUrl,
+      Comments,
+      Gallery: Gallery || [],
+      date: formattedDate,
+      author: user ? user.displayName || "Anonymous" : "Unknown Author",
+    };
+
+    const docRef = await addDoc(collection(db, "articles"), data);
+    console.log("Article created with ID:", docRef.id);
+    return { id: docRef.id, ...data };
+  } catch (error) {
+    console.error("Error creating article:", error);
+    throw error;
+  }
 }
 
-// NOT FINISHED: This only gets the first 20 articles. In a real app,
-// you would implement pagination.
 export async function fetchArticles() {
-  const snapshot = await getDocs(
-    query(collection(db, "articles"), orderBy("date", "desc"), limit(20))
-  );
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...doc.data(),
-  }));
+  try {
+    const snapshot = await getDocs(
+      query(collection(db, "articles"), orderBy("date", "desc"), limit(20))
+    );
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+  } catch (error) {
+    console.error("Error fetching articles:", error);
+    throw error;
+  }
+}
+
+export async function addCommentToArticle(articleId, comment) {
+  try {
+    const articleRef = doc(db, "articles", articleId);
+
+    await updateDoc(articleRef, {
+      Comments: arrayUnion(comment),
+    });
+
+    const updatedArticleSnap = await getDoc(articleRef);
+    const updatedArticleData = updatedArticleSnap.data();
+
+    return updatedArticleData.Comments || [];
+  } catch (error) {
+    console.error("Error adding comment:", error);
+    throw error;
+  }
 }

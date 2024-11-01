@@ -7,7 +7,6 @@ export default function ArticleEntry({ addArticle }) {
   const [category, setCategory] = useState("");
   const [backgroundImageUrl, setBackgroundImageUrl] = useState("");
   const [galleryUrls, setGalleryUrls] = useState([]);
-  const [comments, setComments] = useState("");
   const [error, setError] = useState(null);
 
   async function handleBackgroundImageUpload(e) {
@@ -36,23 +35,33 @@ export default function ArticleEntry({ addArticle }) {
     }
   }
 
-  function submit(e) {
+  async function submit(e) {
     e.preventDefault();
     setError(null);
 
     if (!title.trim() || !body.trim() || !category) {
       setError("Title, body, and category must be supplied");
     } else {
+      const date = new Date();
+      const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
       const newArticle = {
         title,
         body,
         category,
         BackgroundImageUrl: backgroundImageUrl,
-        Comments: comments ? { content: comments, username: "Sample Username" } : null,
+        Comments: [],
         Gallery: galleryUrls.map((url, index) => ({ title: `Image ${index + 1}`, url })),
+        date: formattedDate,
       };
 
-      addArticle(newArticle);
+      try {
+        await addArticle(newArticle);
+        console.log("Article created successfully");
+      } catch (error) {
+        console.error("Error creating article:", error);
+        setError("Failed to create the article. Please try again.");
+      }
     }
   }
 
@@ -86,7 +95,6 @@ export default function ArticleEntry({ addArticle }) {
           <option value="General Aviation">General Aviation</option>
         </select>
 
-        {/* Background Image Upload Button */}
         <button
           type="button"
           className="button"
@@ -99,18 +107,9 @@ export default function ArticleEntry({ addArticle }) {
           type="file"
           onChange={handleBackgroundImageUpload}
           accept="image/*"
-          style={{ display: 'none' }} // Hides the input element
+          style={{ display: 'none' }}
         />
 
-        <label>Comments</label>
-        <textarea
-          rows="3"
-          value={comments}
-          onChange={(e) => setComments(e.target.value)}
-          placeholder="Add comments (optional)"
-        ></textarea>
-
-        {/* Gallery Images Upload Button */}
         <button
           type="button"
           className="button"
@@ -124,7 +123,7 @@ export default function ArticleEntry({ addArticle }) {
           onChange={handleGalleryImagesUpload}
           accept="image/*"
           multiple
-          style={{ display: 'none' }} // Hides the input element
+          style={{ display: 'none' }}
         />
 
         <button className="button" type="submit">Create</button>

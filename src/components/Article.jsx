@@ -13,7 +13,6 @@ export default function Article({ article }) {
         <p className="body">{body}</p>
       </section>
 
-      {/* Gallery Section */}
       {gallery && gallery.length > 0 && (
         <section className="gallery">
           <h3>Gallery</h3>
@@ -28,7 +27,6 @@ export default function Article({ article }) {
         </section>
       )}
 
-      {/* Comments Section */}
       {comments && comments.length > 0 && (
         <section className="comments-section">
           <h3>Comments</h3>
